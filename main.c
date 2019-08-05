@@ -18,6 +18,14 @@ void pc_update(struct cpu *c, uint16_t offset){
     c->pc += offset;
 }
 
+void pc_write(struct cpu *c, uint16_t addr){
+    c->pc = addr;
+}
+
+uint16_t pc_read(struct cpu *c){
+    return c->pc;
+}
+
 void reg_write(struct cpu *c, uint8_t reg_idx, uint16_t data){
     c->reg[reg_idx] = data;
 }
@@ -109,6 +117,7 @@ int main(void){
     uint16_t imm = 0;
     uint32_t res = 0;
     uint16_t res_w = 0;
+    uint16_t pc_temp = 0;
     switch(get_bits(inst, 14, 15)){
         case 0b00:
             //NOP
@@ -120,6 +129,78 @@ int main(void){
             break;
         case 0b01:
             //J-Instruction
+            cpu.flag_carry = 0;
+            cpu.flag_sign = 0;
+            cpu.flag_overflow = 0;
+            cpu.flag_zero = 0;
+            switch(get_bits(inst, 8, 12)){
+                case 0b10010:
+                    //J
+                    pc_update(&cpu, 2);
+                    imm = rom_read_w(&cpu);
+                    pc_update(&cpu, imm-2);
+                    break;
+                case 0b10011:
+                    //JAL
+                    reg_write(&cpu, 0, pc_read(&cpu));
+                    pc_update(&cpu, 2);
+                    imm = rom_read_w(&cpu);
+                    pc_update(&cpu, imm-2);
+                    break;
+                case 0b00001:
+                    //JALR
+                    reg_write(&cpu, 0, pc_read(&cpu));
+                    pc_write(&cpu, reg_read(&cpu, rs));
+                    break;
+                case 0b00000:
+                    //JR
+                    pc_write(&cpu, reg_read(&cpu, rs));
+                    break;
+                case 0b00100:
+                    //JL,JLE
+                    imm = sign_ext(get_bits(inst, 0, 6), 6);
+                    if(get_bits(inst, 7, 7) == 0 && cpu.flag_sign != cpu.flag_overflow){
+                        pc_update(&cpu, imm);
+                    }else if(get_bits(inst, 7, 7) == 1 && (cpu.flag_sign != cpu.flag_overflow || cpu.flag_zero == 1)){
+                        pc_update(&cpu, imm);
+                    }else{
+                        pc_update(&cpu, 2);
+                    }
+                    break;
+                case 0b00101:
+                    //JE,LNE
+                    imm = sign_ext(get_bits(inst, 0, 6), 6);
+                    if(get_bits(inst, 7, 7) == 0 && cpu.flag_zero == 1){
+                        pc_update(&cpu, imm);
+                    }else if(get_bits(inst, 7, 7) == 1 && cpu.flag_zero == 0){
+                        pc_update(&cpu, imm);
+                    }else{
+                        pc_update(&cpu, 2);
+                    }
+                    break;
+                case 0b00110:
+                    //JB,JBE
+                    imm = sign_ext(get_bits(inst, 0, 6), 6);
+                    if(get_bits(inst, 7, 7) == 0 && cpu.flag_carry == 1){
+                        pc_update(&cpu, imm);
+                    }else if(get_bits(inst, 7, 7) == 1 && (cpu.flag_carry == 1 || cpu.flag_zero == 1)){
+                        pc_update(&cpu, imm);
+                    }else{
+                        pc_update(&cpu, 2);
+                    }
+                    break;
+                case 0b11000:
+                    //LI
+                    pc_update(&cpu, 2);
+                    imm = rom_read_w(&cpu);
+                    cpu.flag_carry = 0;
+                    cpu.flag_sign = flag_sign(imm&0xFFFF);
+                    cpu.flag_overflow = 0;
+                    cpu.flag_zero = flag_zero(imm&0xFFFF);
+                    reg_write(&cpu, rd, imm);
+                    pc_update(&cpu, 2);
+                    break;
+            }
             break;
         case 0b10:
             //M-Instruction
@@ -222,7 +303,7 @@ int main(void){
                     cpu.flag_carry = 0;
                     cpu.flag_sign = flag_sign(s_data&0xFFFF);
                     cpu.flag_overflow = 0;
-                    cpu.flag_zero = flag_zero(res&0xFFFF);
+                    cpu.flag_zero = flag_zero(s_data&0xFFFF);
                     break;
                 case 0b0010:
                     //ADD[I]
