@@ -107,10 +107,16 @@ int main(void){
     uint16_t s_data;
     uint16_t d_data;
     uint16_t imm = 0;
+    uint32_t res = 0;
+    uint16_t res_w = 0;
     switch(get_bits(inst, 14, 15)){
         case 0b00:
             //NOP
             pc_update(&cpu, 2);
+            cpu.flag_sign = 0;
+            cpu.flag_overflow = 0;
+            cpu.flag_zero = 0;
+            cpu.flag_carry = 0;
             break;
         case 0b01:
             //J-Instruction
@@ -121,44 +127,84 @@ int main(void){
                 case 0b00:
                     //SWSP
                     imm = (get_bits(inst, 8, 11)<<5)+(rs<<1);
-                    mem_write_w(&cpu, reg_read(&cpu, 1)+imm, reg_read(&cpu, rs));
+                    s_data = reg_read(&cpu, 1);
+                    res = s_data+imm;
+                    if(res > 0xFFFF){
+                        cpu.flag_carry = 1;
+                    }else{
+                        cpu.flag_carry = 0;
+                    }
+                    cpu.flag_sign = flag_sign(res&0xFFFF);
+                    cpu.flag_overflow = flag_overflow(imm, s_data, res&0xFFFF);
+                    cpu.flag_zero = flag_zero(res&0xFFFF);
+                    mem_write_w(&cpu, res&0xFFFF, reg_read(&cpu, rs));
                     pc_update(&cpu, 2);
                     break;
                 case 0b01:
                     //SW,SB
                     pc_update(&cpu, 2);
                     imm = rom_read_w(&cpu);
+                    d_data = reg_read(&cpu, rd);
+                    res = imm+d_data;
+                    if(res > 0xFFFF){
+                        cpu.flag_carry = 1;
+                    }else{
+                        cpu.flag_carry = 0;
+                    }
+                    cpu.flag_sign = flag_sign(res&0xFFFF);
+                    cpu.flag_overflow = flag_overflow(imm, d_data, res&0xFFFF);
+                    cpu.flag_zero = flag_zero(res&0xFFFF);
                     if(get_bits(inst, 11, 11)){
                         //SW
-                        mem_write_w(&cpu, reg_read(&cpu, rd)+imm, reg_read(&cpu, rs));
+                        mem_write_w(&cpu, res&0xFFFF, reg_read(&cpu, rs));
                     }else{
                         //SB
-                        mem_write_b(&cpu, reg_read(&cpu, rd)+imm, reg_read(&cpu, rs)&0xFF);
+                        mem_write_b(&cpu, res&0xFFFF, reg_read(&cpu, rs)&0xFF);
                     }
                     pc_update(&cpu, 2);
                     break;
                 case 0b10:
                     //LWSP
                     imm = (get_bits(inst, 4, 11)<<1);
-                    reg_write(&cpu, rd, mem_read_w(&cpu, reg_read(&cpu, 1)+imm));
+                    d_data = reg_read(&cpu, 1);
+                    res = imm+d_data;
+                    if(res > 0xFFFF){
+                        cpu.flag_carry = 1;
+                    }else{
+                        cpu.flag_carry = 0;
+                    }
+                    cpu.flag_sign = flag_sign(res&0xFFFF);
+                    cpu.flag_overflow = flag_overflow(imm, d_data, res&0xFFFF);
+                    cpu.flag_zero = flag_zero(res&0xFFFF);
+                    reg_write(&cpu, rd, mem_read_w(&cpu, res&0xFFFF));
                     pc_update(&cpu, 2);
                     break;
                 case 0b11:
                     //LW,LB[U]
                     pc_update(&cpu, 2);
                     imm = rom_read_w(&cpu);
+                    s_data = reg_read(&cpu, rs);
+                    res = imm+s_data;
+                    if(res > 0xFFFF){
+                        cpu.flag_carry = 1;
+                    }else{
+                        cpu.flag_carry = 0;
+                    }
+                    cpu.flag_sign = flag_sign(res&0xFFFF);
+                    cpu.flag_overflow = flag_overflow(imm, s_data, res&0xFFFF);
+                    cpu.flag_zero = flag_zero(res&0xFFFF);
                     switch(get_bits(inst, 10, 11)){
                         case 0b00:
                             //LW
-                            reg_write(&cpu, rd, mem_read_w(&cpu, rs+imm));
+                            reg_write(&cpu, rd, mem_read_w(&cpu, res&0xFFFF));
                             break;
                         case 0b10:
                             //LBU
-                            reg_write(&cpu, rd, mem_read_b(&cpu, rs+imm));
+                            reg_write(&cpu, rd, mem_read_b(&cpu, res&0xFFFF));
                             break;
                         case 0b11:
                             //LB
-                            reg_write(&cpu, rd, sign_ext(mem_read_b(&cpu, rs+imm), 7));
+                            reg_write(&cpu, rd, sign_ext(mem_read_b(&cpu, res&0xFFFF), 7));
                             break;
                     }
                     pc_update(&cpu, 2);
@@ -170,8 +216,13 @@ int main(void){
             switch(get_bits(inst, 8, 11)){
                 case 0b0000:
                     //MOV
-                    reg_write(&cpu, rd, reg_read(&cpu, rs));
+                    s_data = reg_read(&cpu, rs);
+                    reg_write(&cpu, rd, s_data);
                     pc_update(&cpu, 2);
+                    cpu.flag_carry = 0;
+                    cpu.flag_sign = flag_sign(s_data&0xFFFF);
+                    cpu.flag_overflow = 0;
+                    cpu.flag_zero = flag_zero(res&0xFFFF);
                     break;
                 case 0b0010:
                     //ADD[I]
@@ -185,6 +236,9 @@ int main(void){
                         }else{
                             cpu.flag_carry = 0;
                         }
+                        cpu.flag_sign = flag_sign(res&0xFFFF);
+                        cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
+                        cpu.flag_zero = flag_zero(res&0xFFFF);
                         reg_write(&cpu, rd, res&0xFFFF);
                     }else{
                         //ADDI
@@ -196,6 +250,9 @@ int main(void){
                         }else{
                             cpu.flag_carry = 0;
                         }
+                        cpu.flag_sign = flag_sign(res&0xFFFF);
+                        cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
+                        cpu.flag_zero = flag_zero(res&0xFFFF);
                         reg_write(&cpu, rd, res&0xFFFF);
                     }
                     pc_update(&cpu, 2);
@@ -212,6 +269,9 @@ int main(void){
                         }else{
                             cpu.flag_carry = 0;
                         }
+                        cpu.flag_sign = flag_sign(res&0xFFFF);
+                        cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
+                        cpu.flag_zero = flag_zero(res&0xFFFF);
                         reg_write(&cpu, rd, res&0xFFFF);
                     }else{
                         //CMPI
@@ -223,37 +283,82 @@ int main(void){
                         }else{
                             cpu.flag_carry = 0;
                         }
+                        cpu.flag_sign = flag_sign(res&0xFFFF);
+                        cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
+                        cpu.flag_zero = flag_zero(res&0xFFFF);
                     }
                     pc_update(&cpu, 2);
                     break;
                 case 0b0100:
                     //AND
-                    reg_write(&cpu, rd, reg_read(&cpu, rd)&reg_read(&cpu, rs));
+                    s_data = reg_read(&cpu, rs);
+                    d_data = reg_read(&cpu, rd);
+                    res_w = s_data&d_data;
+                    reg_write(&cpu, rd, res_w);
+                    cpu.flag_carry = 0;
+                    cpu.flag_sign = flag_sign(res_w);
+                    cpu.flag_overflow = flag_overflow(s_data, d_data, res_w);
+                    cpu.flag_zero = flag_zero(res_w);
                     pc_update(&cpu, 2);
                     break;
                 case 0b0101:
                     //OR
-                    reg_write(&cpu, rd, reg_read(&cpu, rd)|reg_read(&cpu, rs));
+                    s_data = reg_read(&cpu, rs);
+                    d_data = reg_read(&cpu, rd);
+                    res_w = s_data|d_data;
+                    reg_write(&cpu, rd, res_w);
+                    cpu.flag_carry = 0;
+                    cpu.flag_sign = flag_sign(res_w);
+                    cpu.flag_overflow = flag_overflow(s_data, d_data, res_w);
+                    cpu.flag_zero = flag_zero(res_w);
                     pc_update(&cpu, 2);
                     break;
                 case 0b0110:
                     //XOR
-                    reg_write(&cpu, rd, reg_read(&cpu, rd)^reg_read(&cpu, rs));
+                    s_data = reg_read(&cpu, rs);
+                    d_data = reg_read(&cpu, rd);
+                    res_w = s_data|d_data;
+                    reg_write(&cpu, rd, res_w);
+                    cpu.flag_carry = 0;
+                    cpu.flag_sign = flag_sign(res_w);
+                    cpu.flag_overflow = flag_overflow(s_data, d_data, res_w);
+                    cpu.flag_zero = flag_zero(res_w);
                     pc_update(&cpu, 2);
                     break;
                 case 0b1001:
                     //LSL
-                    reg_write(&cpu, rd, reg_read(&cpu, rd) << rs);
+                    s_data = reg_read(&cpu, rs);
+                    d_data = reg_read(&cpu, rd);
+                    res_w = d_data << s_data;
+                    reg_write(&cpu, rd, res_w);
+                    cpu.flag_carry = 0;
+                    cpu.flag_sign = flag_sign(res_w);
+                    cpu.flag_overflow = flag_overflow(s_data, d_data, res_w);
+                    cpu.flag_zero = flag_zero(res_w);
                     pc_update(&cpu, 2);
                     break;
                 case 0b1010:
                     //LSR
-                    reg_write(&cpu, rd, reg_read(&cpu, rd) >> rs);
+                    s_data = reg_read(&cpu, rs);
+                    d_data = reg_read(&cpu, rd);
+                    res_w = d_data >> s_data;
+                    reg_write(&cpu, rd, res_w);
+                    cpu.flag_carry = 0;
+                    cpu.flag_sign = flag_sign(res_w);
+                    cpu.flag_overflow = flag_overflow(s_data, d_data, res_w);
+                    cpu.flag_zero = flag_zero(res_w);
                     pc_update(&cpu, 2);
                     break;
                 case 0b1100:
                     //ASR
-                    reg_write(&cpu, rd, ((uint16_t)reg_read(&cpu, rd)) >> rs);
+                    s_data = reg_read(&cpu, rs);
+                    d_data = reg_read(&cpu, rd);
+                    res_w = ((int16_t)d_data) >> s_data;
+                    reg_write(&cpu, rd, res_w);
+                    cpu.flag_carry = 0;
+                    cpu.flag_sign = flag_sign(res_w);
+                    cpu.flag_overflow = flag_overflow(s_data, d_data, res_w);
+                    cpu.flag_zero = flag_zero(res_w);
                     pc_update(&cpu, 2);
                     break;
             }
