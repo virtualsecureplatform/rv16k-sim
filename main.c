@@ -1,18 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
-
-#define INST_ROM_SIZE 512
-#define DATA_RAM_SIZE 512
-struct cpu {
-    uint16_t reg[16];
-    uint16_t pc;
-    uint8_t inst_rom[INST_ROM_SIZE];
-    uint8_t data_ram[DATA_RAM_SIZE];
-    uint8_t flag_sign;
-    uint8_t flag_overflow;
-    uint8_t flag_zero;
-    uint8_t flag_carry;
-};
+#include "cpu.h"
+#include "elf_parser.h"
 
 void pc_update(struct cpu *c, uint16_t offset){
     c->pc += offset;
@@ -105,9 +94,10 @@ void init_cpu(struct cpu *c){
     c->flag_carry = 0;
 }
 
-int main(void){
+int main(char* argv[], int argc){
     struct cpu cpu;
     init_cpu(&cpu);
+    elf_parse(&cpu, argv[1]);
 
     uint16_t inst = rom_read_w(&cpu);
     uint8_t rs = get_bits(inst, 4, 7);
