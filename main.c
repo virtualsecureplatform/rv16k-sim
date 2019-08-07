@@ -5,12 +5,12 @@
 
 void pc_update(struct cpu *c, uint16_t offset){
     c->pc += offset;
-    printf("PC <= 0x%04X\n", c->pc);
+    printf("PC <= 0x%04X ", c->pc);
 }
 
 void pc_write(struct cpu *c, uint16_t addr){
     c->pc = addr;
-    printf("PC <= 0x%04X\n", c->pc);
+    printf("PC <= 0x%04X ", c->pc);
 }
 
 uint16_t pc_read(struct cpu *c){
@@ -19,7 +19,7 @@ uint16_t pc_read(struct cpu *c){
 
 void reg_write(struct cpu *c, uint8_t reg_idx, uint16_t data){
     c->reg[reg_idx] = data;
-    printf("Reg x%d <= 0x%04X\n", reg_idx, data);
+    printf("Reg x%d <= 0x%04X ", reg_idx, data);
 }
 
 uint16_t reg_read(struct cpu *c, uint8_t reg_idx){
@@ -28,14 +28,14 @@ uint16_t reg_read(struct cpu *c, uint8_t reg_idx){
 
 void mem_write_b(struct cpu *c, uint16_t addr, uint8_t data){
     c->data_ram[addr] = data;
-    printf("DataRam[0x%04X] <= 0x%04X\n", addr, data);
+    printf("DataRam[0x%04X] <= 0x%04X ", addr, data);
 }
 
 void mem_write_w(struct cpu *c, uint16_t addr, uint16_t data){
     c->data_ram[addr] = data&0xFF;
     c->data_ram[addr+1] = data>>8;
-    printf("DataRam[0x%04X] <= 0x%04X\n", addr, data&0xFF);
-    printf("DataRam[0x%04X] <= 0x%04X\n", addr, data>>8);
+    printf("DataRam[0x%04X] <= 0x%04X ", addr, data&0xFF);
+    printf("DataRam[0x%04X] <= 0x%04X ", addr, data>>8);
 }
 
 uint8_t mem_read_b(struct cpu *c, uint16_t addr){
@@ -83,7 +83,7 @@ uint8_t flag_overflow(uint16_t s1, uint16_t s2, uint16_t res){
 }
 
 void print_flags(struct cpu *c){
-    printf("FLAGS(SZCV) <= %d%d%d%d\n", c->flag_sign, c->flag_zero, c->flag_carry, c->flag_overflow);
+    printf("FLAGS(SZCV) <= %d%d%d%d ", c->flag_sign, c->flag_zero, c->flag_carry, c->flag_overflow);
 }
 
 void init_cpu(struct cpu *c){
@@ -480,5 +480,6 @@ int main(char* argv[], int argc){
             break;
             }
     print_flags(&cpu);
+    printf("\n");
     return 0;
 }
