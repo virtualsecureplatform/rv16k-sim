@@ -5,10 +5,12 @@
 
 void pc_update(struct cpu *c, uint16_t offset){
     c->pc += offset;
+    printf("PC <= 0x%04X\n", c->pc);
 }
 
 void pc_write(struct cpu *c, uint16_t addr){
     c->pc = addr;
+    printf("PC <= 0x%04X\n", c->pc);
 }
 
 uint16_t pc_read(struct cpu *c){
@@ -17,6 +19,7 @@ uint16_t pc_read(struct cpu *c){
 
 void reg_write(struct cpu *c, uint8_t reg_idx, uint16_t data){
     c->reg[reg_idx] = data;
+    printf("Reg x%d <= 0x%04X", reg_idx, data);
 }
 
 uint16_t reg_read(struct cpu *c, uint8_t reg_idx){
@@ -25,11 +28,14 @@ uint16_t reg_read(struct cpu *c, uint8_t reg_idx){
 
 void mem_write_b(struct cpu *c, uint16_t addr, uint8_t data){
     c->data_ram[addr] = data;
+    printf("DataRam[0x%04X] <= 0x%04X", addr, data);
 }
 
 void mem_write_w(struct cpu *c, uint16_t addr, uint16_t data){
     c->data_ram[addr] = data&0xFF;
     c->data_ram[addr+1] = data>>8;
+    printf("DataRam[0x%04X] <= 0x%04X", addr, data&0xFF);
+    printf("DataRam[0x%04X] <= 0x%04X", addr, data>>8);
 }
 
 uint8_t mem_read_b(struct cpu *c, uint16_t addr){
@@ -74,6 +80,10 @@ uint8_t flag_overflow(uint16_t s1, uint16_t s2, uint16_t res){
     uint8_t s2_sign = get_bits(s2, 15, 15);
     uint8_t res_sign = get_bits(res, 15, 15);
     return ((s1_sign^s2_sign) == 0)&((s2_sign^res_sign) == 1);
+}
+
+void print_flags(struct cpu *c){
+    printf("FLAGS(SZCV) <= %d%d%d%d\n", c->flag_sign, c->flag_zero, c->flag_carry, c->flag_overflow);
 }
 
 void init_cpu(struct cpu *c){
@@ -434,6 +444,7 @@ int main(char* argv[], int argc){
                     break;
             }
             break;
-    }
+            }
+    print_flags(&cpu);
     return 0;
 }
