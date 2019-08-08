@@ -104,17 +104,21 @@ void init_cpu(struct cpu *c){
     c->flag_overflow = 0;
     c->flag_zero = 0;
     c->flag_carry = 0;
+    /*
     c->inst_rom[0] = 0x08;
     c->inst_rom[1] = 0x78;
     c->inst_rom[2] = 0xFF;
     c->inst_rom[3] = 0xFF;
+    */
 }
 
-int main(char* argv[], int argc){
+int main(int argc, char *argv[]){
     struct cpu cpu;
     init_cpu(&cpu);
-    //elf_parse(&cpu, argv[1]);
+    elf_parse(&cpu, argv[1]);
+    printf("0x%02X 0x%02X\n", cpu.inst_rom[0], cpu.inst_rom[1]);
 
+for(int i=0;i<10;i++){
     uint16_t inst = rom_read_w(&cpu);
     uint8_t rs = get_bits(inst, 4, 7);
     uint8_t rd = get_bits(inst, 0, 3);
@@ -140,7 +144,7 @@ int main(char* argv[], int argc){
         printf("Inst:J\n");
         pc_update(&cpu, 2);
         imm = rom_read_w(&cpu);
-        pc_update(&cpu, imm-2);
+        pc_update(&cpu, imm);
     }else if(bitpat_match_s(inst, inst_bitpat[INST_JAL])){
         cpu.flag_carry = 0;
         cpu.flag_sign = 0;
@@ -150,7 +154,7 @@ int main(char* argv[], int argc){
         reg_write(&cpu, 0, pc_read(&cpu));
         pc_update(&cpu, 2);
         imm = rom_read_w(&cpu);
-        pc_update(&cpu, imm-2);
+        pc_update(&cpu, imm);
     }else if(bitpat_match_s(inst, inst_bitpat[INST_JALR])){
         cpu.flag_carry = 0;
         cpu.flag_sign = 0;
@@ -495,5 +499,6 @@ int main(char* argv[], int argc){
     }
     print_flags(&cpu);
     printf("\n");
+}
     return 0;
 }

@@ -6,7 +6,7 @@
 #include "elf.h"
 #include "cpu.h"
 
-//#define DEBUG
+#define DEBUG
 
 void elf_parse(struct cpu *c, char* file_name){
     struct stat st;
@@ -60,14 +60,13 @@ void elf_parse(struct cpu *c, char* file_name){
         printf("Shdr:%d sh_size:%04X\n", i, Shdr[i].sh_size);
 #endif
         if(Shdr[i].sh_flags & PF_W){
-            uint16_t *obj = (uint16_t *)(file_buffer+Shdr[i].sh_offset);
-            for(int j=0;j<Shdr[i].sh_size/2;j++){
-                printf("%04X %04X\n", j, obj[j]);
+            uint8_t *obj = (uint8_t *)(file_buffer+Shdr[i].sh_offset);
+            for(int j=0;j<Shdr[i].sh_size;j+=2){
+                printf("%04X %02X%02X\n", j, obj[j], obj[j+1]);
+                c->inst_rom[j] = obj[j];
+                c->inst_rom[j+1] = obj[j+1];
             }
             printf("\n");
-            for(int j=0;j<Shdr[i].sh_size/2;j++){
-                c->inst_rom[j] = obj[j];
-            }
         }
     }
 }
