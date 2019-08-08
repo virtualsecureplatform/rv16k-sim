@@ -1,4 +1,4 @@
-main: main.c elf_parser.c
-	gcc -o main main.c elf_parser.c
+main: main.c elf_parser.c bitpat.c
+	gcc -o main main.c elf_parser.c bitpat.c
 clean:
 	rm main

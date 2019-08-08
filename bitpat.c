@@ -7,11 +7,11 @@ bool bitpat_match_s(uint16_t t, const char* s){
     int bit_cnt = 0;
 
     if(s[idx++] != '0'){
-        printf("Invalid pattern\n");
+        fprintf(stderr, "Invalid pattern\n");
         return false;
     }
     if(s[idx++] != 'b'){
-        printf("Invalid pattern\n");
+        fprintf(stderr, "Invalid pattern\n");
         return false;
     }
 
@@ -43,14 +43,4 @@ bool bitpat_match_s(uint16_t t, const char* s){
         }
     }
     return true;
-}
-
-int main(){
-    uint16_t test = 0b1010101010101010;
-    char *pattern = "0bx010_1010_1010_1010";
-    if(bitpat_match_s(test, pattern)){
-        printf("true\n");
-    }else{
-        printf("false\n");
-    }
 }
