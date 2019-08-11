@@ -6,7 +6,7 @@
 #include "elf.h"
 #include "cpu.h"
 
-#define DEBUG
+//#define DEBUG
 
 void elf_parse(struct cpu *c, char* file_name){
     struct stat st;
