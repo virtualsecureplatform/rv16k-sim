@@ -106,12 +106,6 @@ void init_cpu(struct cpu *c){
     c->flag_overflow = 0;
     c->flag_zero = 0;
     c->flag_carry = 0;
-    /*
-    c->inst_rom[0] = 0x08;
-    c->inst_rom[1] = 0x78;
-    c->inst_rom[2] = 0xFF;
-    c->inst_rom[3] = 0xFF;
-    */
 }
 
 int main(int argc, char *argv[]){
@@ -152,8 +146,8 @@ for(int i=0;i<atoi(argv[2]);i++){
         cpu.flag_sign = 0;
         cpu.flag_overflow = 0;
         cpu.flag_zero = 0;
-        reg_write(&cpu, 0, pc_read(&cpu));
         pc_update(&cpu, 2);
+        reg_write(&cpu, 0, pc_read(&cpu)+2);
         imm = rom_read_w(&cpu);
         pc_update(&cpu, imm);
     }else if(bitpat_match_s(inst, inst_bitpat[INST_JALR])){
@@ -162,7 +156,7 @@ for(int i=0;i<atoi(argv[2]);i++){
         cpu.flag_sign = 0;
         cpu.flag_overflow = 0;
         cpu.flag_zero = 0;
-        reg_write(&cpu, 0, pc_read(&cpu));
+        reg_write(&cpu, 0, pc_read(&cpu)+2);
         pc_write(&cpu, reg_read(&cpu, rs));
     }else if(bitpat_match_s(inst, inst_bitpat[INST_JR])){
         printf("Inst:JR ");
