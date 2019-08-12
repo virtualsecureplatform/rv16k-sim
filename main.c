@@ -259,9 +259,9 @@ int main(int argc, char *argv[]){
             s_data = reg_read(&cpu, 1);
             res = s_data+imm;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, s_data, res&0xFFFF);
@@ -275,9 +275,9 @@ int main(int argc, char *argv[]){
             d_data = reg_read(&cpu, rd);
             res = imm+d_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, d_data, res&0xFFFF);
@@ -292,9 +292,9 @@ int main(int argc, char *argv[]){
             d_data = reg_read(&cpu, rd);
             res = imm+d_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, d_data, res&0xFFFF);
@@ -307,9 +307,9 @@ int main(int argc, char *argv[]){
             d_data = reg_read(&cpu, 1);
             res = imm+d_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, d_data, res&0xFFFF);
@@ -322,9 +322,9 @@ int main(int argc, char *argv[]){
             s_data = reg_read(&cpu, rs);
             res = imm+s_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, s_data, res&0xFFFF);
@@ -337,9 +337,9 @@ int main(int argc, char *argv[]){
             s_data = reg_read(&cpu, rs);
             res = imm+s_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, s_data, res&0xFFFF);
@@ -353,9 +353,9 @@ int main(int argc, char *argv[]){
             s_data = reg_read(&cpu, rs);
             res = imm+s_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, s_data, res&0xFFFF);
@@ -378,9 +378,9 @@ int main(int argc, char *argv[]){
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
@@ -393,9 +393,9 @@ int main(int argc, char *argv[]){
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
@@ -408,9 +408,9 @@ int main(int argc, char *argv[]){
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
@@ -423,9 +423,9 @@ int main(int argc, char *argv[]){
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
             if(res > 0xFFFF){
-                cpu.flag_carry = 1;
-            }else{
                 cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
             }
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
