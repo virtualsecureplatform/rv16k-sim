@@ -504,5 +504,12 @@ int main(int argc, char *argv[]){
         print_flags(&cpu);
         printf("\n");
     }
+
+    for (int i = 0; i < 16; i++){
+        uint16_t val = reg_read(&cpu, i);
+        printf("x%d=%d\t", i, val);
+    }
+    puts("");
+
     return 0;
 }
