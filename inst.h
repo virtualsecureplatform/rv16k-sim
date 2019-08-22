@@ -43,7 +43,7 @@ char *inst_bitpat[] = {
     "0b1001_0010_xxxx_xxxx", //SW
     "0b1000_xxxx_xxxx_xxxx", //SWSP
     "0b1001_1010_xxxx_xxxx", //SB
-    "0b1100_0000_xxxx_xxxx", //MOV
+    "0b1110_0000_xxxx_xxxx", //MOV
     "0b1110_0010_xxxx_xxxx", //ADD
     "0b1110_0011_xxxx_xxxx", //SUB
     "0b1110_0100_xxxx_xxxx", //AND
