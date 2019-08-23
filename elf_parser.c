@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -47,6 +48,7 @@ void elf_parse(struct cpu *c, char* file_name){
     }
 #ifdef DEBUG
     printf("Type:ELF32\n");
+    printf("Entry point:%d\n\n", Ehdr->e_entry);
 #endif
 
     Elf32_Shdr *Shdr = (Elf32_Shdr *)(file_buffer + Ehdr->e_shoff);
@@ -60,6 +62,9 @@ void elf_parse(struct cpu *c, char* file_name){
         printf("Shdr:%d sh_size:%04X\n", i, Shdr[i].sh_size);
 #endif
         if(Shdr[i].sh_flags & PF_W){
+            // For now we assume that .text section begins at address 0.
+            assert(Shdr[i].sh_addr == 0 && "The beginning address of .text section should be 0.");
+
             uint8_t *obj = (uint8_t *)(file_buffer+Shdr[i].sh_offset);
             for(int j=0;j<Shdr[i].sh_size;j+=2){
                 printf("%04X %02X%02X\n", j, obj[j], obj[j+1]);
@@ -69,4 +74,6 @@ void elf_parse(struct cpu *c, char* file_name){
             printf("\n");
         }
     }
+
+    c->pc = Ehdr->e_entry;
 }
