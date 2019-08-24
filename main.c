@@ -333,6 +333,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = flag_zero(res&0xFFFF);
             printf("Inst:LW ");
             reg_write(&cpu, rd, mem_read_w(&cpu, res&0xFFFF));
+            pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_LB])){
             pc_update(&cpu, 2);
             imm = rom_read_w(&cpu);
