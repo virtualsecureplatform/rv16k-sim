@@ -133,14 +133,14 @@ int main(int argc, char *argv[]){
         uint16_t pc_temp = 0;
         if(bitpat_match_s(inst, inst_bitpat[INST_NOP])){
             //NOP
-            printf("Inst:NOP ");
+            printf("Inst:NOP\t");
             pc_update(&cpu, 2);
             cpu.flag_sign = 0;
             cpu.flag_overflow = 0;
             cpu.flag_zero = 0;
             cpu.flag_carry = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_J])){
-            printf("Inst:J ");
+            printf("Inst:J\t");
             cpu.flag_carry = 0;
             cpu.flag_sign = 0;
             cpu.flag_overflow = 0;
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]){
             imm = rom_read_w(&cpu);
             pc_update(&cpu, imm);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JAL])){
-            printf("Inst:JAL ");
+            printf("Inst:JAL\t");
             cpu.flag_carry = 0;
             cpu.flag_sign = 0;
             cpu.flag_overflow = 0;
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]){
             imm = rom_read_w(&cpu);
             pc_update(&cpu, imm);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JALR])){
-            printf("Inst:JALR ");
+            printf("Inst:JALR\t");
             cpu.flag_carry = 0;
             cpu.flag_sign = 0;
             cpu.flag_overflow = 0;
@@ -167,14 +167,14 @@ int main(int argc, char *argv[]){
             reg_write(&cpu, 0, pc_read(&cpu)+2);
             pc_write(&cpu, reg_read(&cpu, rs));
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JR])){
-            printf("Inst:JR ");
+            printf("Inst:JR\t");
             cpu.flag_carry = 0;
             cpu.flag_sign = 0;
             cpu.flag_overflow = 0;
             cpu.flag_zero = 0;
             pc_write(&cpu, reg_read(&cpu, rs));
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JL])){
-            printf("Inst:JL ");
+            printf("Inst:JL\t");
             imm = sign_ext(get_bits(inst, 0, 6)<<1, 6) ;
             if(cpu.flag_sign != cpu.flag_overflow){
                 pc_update(&cpu, imm);
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]){
             cpu.flag_overflow = 0;
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JLE])){
-            printf("Inst:JLE ");
+            printf("Inst:JLE\t");
             imm = sign_ext(get_bits(inst, 0, 6)<<1, 6);
             if(cpu.flag_sign != cpu.flag_overflow || cpu.flag_zero == 1){
                 pc_update(&cpu, imm);
@@ -198,8 +198,8 @@ int main(int argc, char *argv[]){
             cpu.flag_overflow = 0;
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JE])){
+            printf("Inst:JE\t");
             imm = sign_ext(get_bits(inst, 0, 6)<<1, 6);
-            printf("Inst:JE ");
             if(cpu.flag_zero == 1){
                 pc_update(&cpu, imm);
             }else{
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]){
             cpu.flag_overflow = 0;
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JNE])){
-            printf("Inst:JNE ");
+            printf("Inst:JNE\t");
             imm = sign_ext(get_bits(inst, 0, 6)<<1, 6);
             if(cpu.flag_zero == 0){
                 pc_update(&cpu, imm);
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]){
             cpu.flag_overflow = 0;
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JB])){
-            printf("Inst:JB ");
+            printf("Inst:JB\t");
             imm = (sign_ext(get_bits(inst, 0, 6)<<1, 6));
             if(cpu.flag_carry == 1){
                 pc_update(&cpu, imm);
@@ -234,7 +234,7 @@ int main(int argc, char *argv[]){
             cpu.flag_overflow = 0;
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JBE])){
-            printf("Inst:JBE ");
+            printf("Inst:JBE\t");
             imm = sign_ext(get_bits(inst, 0, 6)<<1, 6);
             if(cpu.flag_carry == 1 || cpu.flag_zero == 1){
                 pc_update(&cpu, imm);
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]){
             cpu.flag_overflow = 0;
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_LI])){
-            printf("Inst:LI ");
+            printf("Inst:LI\t");
             pc_update(&cpu, 2);
             imm = rom_read_w(&cpu);
             cpu.flag_carry = 0;
@@ -256,7 +256,7 @@ int main(int argc, char *argv[]){
             reg_write(&cpu, rd, imm);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_SWSP])){
-            printf("Inst:SWSP ");
+            printf("Inst:SWSP\t");
             imm = (get_bits(inst, 8, 11)<<5)+(rd<<1);
             s_data = reg_read(&cpu, 1);
             res = s_data+imm;
@@ -271,7 +271,7 @@ int main(int argc, char *argv[]){
             mem_write_w(&cpu, res&0xFFFF, reg_read(&cpu, rs));
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_SW])){
-            printf("Inst:SW ");
+            printf("Inst:SW\t");
             pc_update(&cpu, 2);
             imm = rom_read_w(&cpu);
             d_data = reg_read(&cpu, rd);
@@ -288,7 +288,7 @@ int main(int argc, char *argv[]){
             pc_update(&cpu, 2);
 
         }else if(bitpat_match_s(inst, inst_bitpat[INST_SB])){
-            printf("Inst:SB ");
+            printf("Inst:SB\t");
             pc_update(&cpu, 2);
             imm = rom_read_w(&cpu);
             d_data = reg_read(&cpu, rd);
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]){
             mem_write_b(&cpu, res&0xFFFF, reg_read(&cpu, rs)&0xFF);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_LWSP])){
-            printf("Inst:LWSP ");
+            printf("Inst:LWSP\t");
             imm = (get_bits(inst, 4, 11)<<1);
             d_data = reg_read(&cpu, 1);
             res = imm+d_data;
@@ -319,6 +319,7 @@ int main(int argc, char *argv[]){
             reg_write(&cpu, rd, mem_read_w(&cpu, res&0xFFFF));
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_LW])){
+            printf("Inst:LW\t");
             pc_update(&cpu, 2);
             imm = rom_read_w(&cpu);
             s_data = reg_read(&cpu, rs);
@@ -331,10 +332,10 @@ int main(int argc, char *argv[]){
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, s_data, res&0xFFFF);
             cpu.flag_zero = flag_zero(res&0xFFFF);
-            printf("Inst:LW ");
             reg_write(&cpu, rd, mem_read_w(&cpu, res&0xFFFF));
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_LB])){
+            printf("Inst:LB\t");
             pc_update(&cpu, 2);
             imm = rom_read_w(&cpu);
             s_data = reg_read(&cpu, rs);
@@ -347,10 +348,10 @@ int main(int argc, char *argv[]){
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, s_data, res&0xFFFF);
             cpu.flag_zero = flag_zero(res&0xFFFF);
-            printf("Inst:LB ");
             reg_write(&cpu, rd, sign_ext(mem_read_b(&cpu, res&0xFFFF), 7));
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_LBU])){
+            printf("Inst:LBU\t");
             pc_update(&cpu, 2);
             imm = rom_read_w(&cpu);
             s_data = reg_read(&cpu, rs);
@@ -363,11 +364,10 @@ int main(int argc, char *argv[]){
             cpu.flag_sign = flag_sign(res&0xFFFF);
             cpu.flag_overflow = flag_overflow(imm, s_data, res&0xFFFF);
             cpu.flag_zero = flag_zero(res&0xFFFF);
-            printf("Inst:LBU ");
             reg_write(&cpu, rd, mem_read_b(&cpu, res&0xFFFF));
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_MOV])){
-            printf("Inst:MOV ");
+            printf("Inst:MOV\t");
             s_data = reg_read(&cpu, rs);
             reg_write(&cpu, rd, s_data);
             pc_update(&cpu, 2);
@@ -376,7 +376,7 @@ int main(int argc, char *argv[]){
             cpu.flag_overflow = 0;
             cpu.flag_zero = flag_zero(s_data&0xFFFF);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_ADD])){
-            printf("Inst:ADD ");
+            printf("Inst:ADD\t");
             s_data = reg_read(&cpu, rs);
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
@@ -391,7 +391,7 @@ int main(int argc, char *argv[]){
             reg_write(&cpu, rd, res&0xFFFF);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_ADDI])){
-            printf("Inst:ADDI ");
+            printf("Inst:ADDI\t");
             s_data = sign_ext(rs, 3);
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
@@ -406,7 +406,7 @@ int main(int argc, char *argv[]){
             reg_write(&cpu, rd, res&0xFFFF);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_SUB])){
-            printf("Inst:SUB ");
+            printf("Inst:SUB\t");
             s_data = (~reg_read(&cpu, rs))+1;
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
@@ -421,7 +421,7 @@ int main(int argc, char *argv[]){
             reg_write(&cpu, rd, res&0xFFFF);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_CMP])){
-            printf("Inst:CMP ");
+            printf("Inst:CMP\t");
             s_data = (~reg_read(&cpu, rs))+1;
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
@@ -435,7 +435,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = flag_zero(res&0xFFFF);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_AND])){
-            printf("Inst:AND ");
+            printf("Inst:AND\t");
             s_data = reg_read(&cpu, rs);
             d_data = reg_read(&cpu, rd);
             res_w = s_data&d_data;
@@ -446,7 +446,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = flag_zero(res_w);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_OR])){
-            printf("Inst:OR ");
+            printf("Inst:OR\t");
             s_data = reg_read(&cpu, rs);
             d_data = reg_read(&cpu, rd);
             res_w = s_data|d_data;
@@ -457,7 +457,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = flag_zero(res_w);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_XOR])){
-            printf("Inst:XOR ");
+            printf("Inst:XOR\t");
             s_data = reg_read(&cpu, rs);
             d_data = reg_read(&cpu, rd);
             res_w = s_data|d_data;
@@ -468,7 +468,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = flag_zero(res_w);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_LSL])){
-            printf("Inst:LSL ");
+            printf("Inst:LSL\t");
             s_data = reg_read(&cpu, rs);
             d_data = reg_read(&cpu, rd);
             res_w = d_data << s_data;
@@ -479,7 +479,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = flag_zero(res_w);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_LSR])){
-            printf("Inst:LSR ");
+            printf("Inst:LSR\t");
             s_data = reg_read(&cpu, rs);
             d_data = reg_read(&cpu, rd);
             res_w = d_data >> s_data;
@@ -490,7 +490,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = flag_zero(res_w);
             pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_ASR])){
-            printf("Inst:ASR ");
+            printf("Inst:ASR\t");
             s_data = reg_read(&cpu, rs);
             d_data = reg_read(&cpu, rd);
             res_w = ((int16_t)d_data) >> s_data;
