@@ -434,6 +434,20 @@ int main(int argc, char *argv[]){
             cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
             cpu.flag_zero = flag_zero(res&0xFFFF);
             pc_update(&cpu, 2);
+        }else if(bitpat_match_s(inst, inst_bitpat[INST_CMPI])){
+            printf("Inst:CMPI\t");
+            s_data = (~sign_ext(rs, 3))+1;
+            d_data = reg_read(&cpu, rd);
+            uint32_t res = s_data+d_data;
+            if(res > 0xFFFF){
+                cpu.flag_carry = 0;
+            }else{
+                cpu.flag_carry = 1;
+            }
+            cpu.flag_sign = flag_sign(res&0xFFFF);
+            cpu.flag_overflow = flag_overflow(s_data, d_data, res&0xFFFF);
+            cpu.flag_zero = flag_zero(res&0xFFFF);
+            pc_update(&cpu, 2);
         }else if(bitpat_match_s(inst, inst_bitpat[INST_AND])){
             printf("Inst:AND\t");
             s_data = reg_read(&cpu, rs);
