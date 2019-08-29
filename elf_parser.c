@@ -81,6 +81,12 @@ void elf_parse(struct cpu *c, char* file_name){
             uint8_t *obj = (uint8_t *)(file_buffer+Shdr[i].sh_offset);
             uint8_t data_ram_offset = Shdr[i].sh_addr & 0x0000ffff;
 
+            if (strcmp(".bss", name) == 0) {
+                // .bss section shouldn't be loaded to RAM, but be placed after all other sections.
+                // FIXME: Check if this sections is placed after all other sections.
+                continue;
+            }
+
             for(int j=0;j<Shdr[i].sh_size;j+=2){
                 printf("RAM: %04X %02X%02X\n", data_ram_offset + j, obj[j], obj[j+1]);
                 c->data_ram[data_ram_offset+ j] = obj[j];
