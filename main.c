@@ -175,7 +175,7 @@ int main(int argc, char *argv[]){
             pc_write(&cpu, reg_read(&cpu, rs));
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JL])){
             printf("Inst:JL\t");
-            imm = sign_ext(get_bits(inst, 0, 6)<<1, 6) ;
+            imm = sign_ext(get_bits(inst, 0, 6)<<1, 7) ;
             if(cpu.flag_sign != cpu.flag_overflow){
                 pc_update(&cpu, imm);
             }else{
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JLE])){
             printf("Inst:JLE\t");
-            imm = sign_ext(get_bits(inst, 0, 6)<<1, 6);
+            imm = sign_ext(get_bits(inst, 0, 6)<<1, 7);
             if(cpu.flag_sign != cpu.flag_overflow || cpu.flag_zero == 1){
                 pc_update(&cpu, imm);
             }else{
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JE])){
             printf("Inst:JE\t");
-            imm = sign_ext(get_bits(inst, 0, 6)<<1, 6);
+            imm = sign_ext(get_bits(inst, 0, 6)<<1, 7);
             if(cpu.flag_zero == 1){
                 pc_update(&cpu, imm);
             }else{
@@ -211,7 +211,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JNE])){
             printf("Inst:JNE\t");
-            imm = sign_ext(get_bits(inst, 0, 6)<<1, 6);
+            imm = sign_ext(get_bits(inst, 0, 6)<<1, 7);
             if(cpu.flag_zero == 0){
                 pc_update(&cpu, imm);
             }else{
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JB])){
             printf("Inst:JB\t");
-            imm = (sign_ext(get_bits(inst, 0, 6)<<1, 6));
+            imm = (sign_ext(get_bits(inst, 0, 6)<<1, 7));
             if(cpu.flag_carry == 1){
                 pc_update(&cpu, imm);
             }else{
@@ -235,7 +235,7 @@ int main(int argc, char *argv[]){
             cpu.flag_zero = 0;
         }else if(bitpat_match_s(inst, inst_bitpat[INST_JBE])){
             printf("Inst:JBE\t");
-            imm = sign_ext(get_bits(inst, 0, 6)<<1, 6);
+            imm = sign_ext(get_bits(inst, 0, 6)<<1, 7);
             if(cpu.flag_carry == 1 || cpu.flag_zero == 1){
                 pc_update(&cpu, imm);
             }else{
