@@ -71,6 +71,8 @@ void elf_parse(struct cpu *c, char* file_name){
 
             uint8_t *obj = (uint8_t *)(file_buffer+Shdr[i].sh_offset);
             for(int j=0;j<Shdr[i].sh_size;j+=2){
+                assert(j + 1 < INST_ROM_SIZE && "Too large program (.text) data.");
+
                 printf("ROM: %04X %02X%02X\n", j, obj[j], obj[j+1]);
                 c->inst_rom[j] = obj[j];
                 c->inst_rom[j+1] = obj[j+1];
@@ -82,6 +84,8 @@ void elf_parse(struct cpu *c, char* file_name){
             uint8_t data_ram_offset = Shdr[i].sh_addr & 0x0000ffff;
 
             for(int j=0;j<Shdr[i].sh_size;j+=2){
+                assert(data_ram_offset + j + 1 < DATA_RAM_SIZE && "Too large data (.data/.rodata).");
+
                 printf("RAM: %04X %02X%02X\n", data_ram_offset + j, obj[j], obj[j+1]);
                 c->data_ram[data_ram_offset+ j] = obj[j];
                 c->data_ram[data_ram_offset+ j+1] = obj[j+1];
