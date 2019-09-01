@@ -96,5 +96,7 @@ void elf_parse(struct cpu *c, char* file_name){
         }
     }
 
+    // Since RV16K specification says the initial value of PC is 0, e_entry should be 0.
     c->pc = Ehdr->e_entry;
+    assert(c->pc == 0 && "The entry point of the program should be address 0.");
 }
