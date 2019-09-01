@@ -100,8 +100,6 @@ void init_cpu(struct cpu *c){
     for(int i=0;i<16;i++){
         c->reg[i] = 0;
     }
-    // Set initial SP to the end of the RAM.
-    c->reg[1] = DATA_RAM_SIZE - 2;
     for(int i=0;i<INST_ROM_SIZE;i++){
         c->inst_rom[i] = 0;
     }
