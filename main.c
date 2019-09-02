@@ -1,6 +1,8 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "cpu.h"
 #include "elf_parser.h"
 #include "bitpat.h"
@@ -114,12 +116,46 @@ void init_cpu(struct cpu *c){
     c->flag_carry = 0;
 }
 
+void set_bytes_from_str(uint8_t *dst, const char * const src, int N)
+{
+    char *buf = (char *)malloc(strlen(src) + 1);
+    strcpy(buf, src);
+
+    int idst = 0;
+    char *tp;
+    tp = strtok(buf, " ");
+    while (tp != NULL) {
+        assert(idst < N && "Too large data!");
+        uint8_t val = strtol(tp, NULL, 16);
+        dst[idst++] = val;
+        tp = strtok(NULL, " ");
+    }
+
+    free(buf);
+}
+
 int main(int argc, char *argv[]){
     struct cpu cpu;
     init_cpu(&cpu);
-    elf_parse(&cpu, argv[1]);
 
-    for(int i=0;i<atoi(argv[2]);i++){
+    assert(argc >= 3 && "Usage: ./main elf-file-name #cycles");
+
+    int ncycles = 0;
+    if (argc == 3) {
+        elf_parse(&cpu, argv[1]);
+        ncycles = atoi(argv[2]);
+    }else { // Byte sequence has come via argv.
+        assert(argc == 5);
+
+        // For ROM
+        set_bytes_from_str(cpu.inst_rom, argv[2], INST_ROM_SIZE);
+        // For RAM
+        set_bytes_from_str(cpu.data_ram, argv[3], DATA_RAM_SIZE);
+
+        ncycles = atoi(argv[4]);
+    }
+
+    for(int i=0;i<ncycles;i++){
         uint16_t inst = rom_read_w(&cpu);
         uint8_t rs = get_bits(inst, 4, 7);
         uint8_t rd = get_bits(inst, 0, 3);
