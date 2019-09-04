@@ -294,7 +294,7 @@ int main(int argc, char *argv[]){
             imm = (get_bits(inst, 8, 11)<<5)+(rd<<1);
             s_data = reg_read(&cpu, 1);
             res = s_data+imm;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -310,7 +310,7 @@ int main(int argc, char *argv[]){
             imm = rom_read_w(&cpu);
             d_data = reg_read(&cpu, rd);
             res = imm+d_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -327,7 +327,7 @@ int main(int argc, char *argv[]){
             imm = rom_read_w(&cpu);
             d_data = reg_read(&cpu, rd);
             res = imm+d_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -342,7 +342,7 @@ int main(int argc, char *argv[]){
             imm = (get_bits(inst, 4, 11)<<1);
             d_data = reg_read(&cpu, 1);
             res = imm+d_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -358,7 +358,7 @@ int main(int argc, char *argv[]){
             imm = rom_read_w(&cpu);
             s_data = reg_read(&cpu, rs);
             res = imm+s_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -374,7 +374,7 @@ int main(int argc, char *argv[]){
             imm = rom_read_w(&cpu);
             s_data = reg_read(&cpu, rs);
             res = imm+s_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -390,7 +390,7 @@ int main(int argc, char *argv[]){
             imm = rom_read_w(&cpu);
             s_data = reg_read(&cpu, rs);
             res = imm+s_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -414,7 +414,7 @@ int main(int argc, char *argv[]){
             s_data = reg_read(&cpu, rs);
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -429,7 +429,7 @@ int main(int argc, char *argv[]){
             s_data = sign_ext(rs, 3);
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -444,7 +444,7 @@ int main(int argc, char *argv[]){
             s_data = (~reg_read(&cpu, rs))+1;
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
@@ -459,7 +459,7 @@ int main(int argc, char *argv[]){
             s_data = (~reg_read(&cpu, rs))+1;
             d_data = reg_read(&cpu, rd);
             uint32_t res = s_data+d_data;
-            if(res > 0xFFFF){
+            if(res > 0xFFFF || s_data == 0){
                 cpu.flag_carry = 0;
             }else{
                 cpu.flag_carry = 1;
