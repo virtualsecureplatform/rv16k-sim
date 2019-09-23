@@ -13,7 +13,7 @@ failwith() {
 }
 
 testentry() {
-    res=$(./main "test" "$2" "$3" "$1")
+    res=$(./main -q -t "$2" -d "$3" "$1")
     echo "$res" | grep "$4" > /dev/null
     [ "$?" -eq 0 ] || failwith "$1" "$2" "$3" "$4" "$res"
 }
