@@ -16,6 +16,12 @@ void log_printf(char *fmt, ...) {
     va_end(args);
 }
 
+void print_usage(FILE *fh)
+{
+    fprintf(fh, "Usage: rv16k-sim FILENAME NCYCLES [memdump]\n");
+    fprintf(fh, "       rv16k-sim test ROM RAM NCYCLES\n");
+}
+
 void pc_update(struct cpu *c, uint16_t offset){
     c->pc += offset;
     log_printf("PC <= 0x%04X ", c->pc);
@@ -144,17 +150,31 @@ void set_bytes_from_str(uint8_t *dst, const char * const src, int N)
     free(buf);
 }
 
+void dump_memory(FILE *fh, uint8_t *mem, int size)
+{
+    for (int i = 0; i < size; i++) {
+        fprintf(fh, "%02x ", mem[i]);
+        if (i % 16 == 15)   fprintf(fh, "\n");
+    }
+}
+
 int main(int argc, char *argv[]){
     struct cpu cpu;
     init_cpu(&cpu);
 
-    assert(argc >= 3 && "Usage: ./main elf-file-name #cycles");
+    if (argc < 3) {
+        print_usage(stderr);
+        return 1;
+    }
 
-    int ncycles = 0;
-    if (argc == 3) {
+    int ncycles = 0, flag_memory_dump = 0;
+    if (argc == 3 || argc == 4) {
         elf_parse(&cpu, argv[1]);
         ncycles = atoi(argv[2]);
-    }else { // Byte sequence has come via argv.
+
+        if (argc == 4)  // memory-dump mode
+            flag_memory_dump = 1;
+    } else { // Byte sequence has come via argv.
         assert(argc == 5);
 
         // For ROM
@@ -174,7 +194,6 @@ int main(int argc, char *argv[]){
         uint16_t imm = 0;
         uint32_t res = 0;
         uint16_t res_w = 0;
-        uint16_t pc_temp = 0;
         if(bitpat_match_s(inst, inst_bitpat[INST_NOP])){
             //NOP
             log_printf("Inst:NOP\t");
@@ -564,6 +583,11 @@ int main(int argc, char *argv[]){
         }
         print_flags(&cpu);
         log_printf("\n");
+
+        if (flag_memory_dump){
+            dump_memory(stdout, cpu.data_ram, DATA_RAM_SIZE);
+            printf("\n");
+        }
     }
 
     for (int i = 0; i < 16; i++){
