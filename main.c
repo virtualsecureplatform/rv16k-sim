@@ -508,7 +508,7 @@ int main(int argc, char *argv[]){
             printf("Inst:XOR\t");
             s_data = reg_read(&cpu, rs);
             d_data = reg_read(&cpu, rd);
-            res_w = s_data|d_data;
+            res_w = s_data^d_data;
             reg_write(&cpu, rd, res_w);
             cpu.flag_carry = 0;
             cpu.flag_sign = flag_sign(res_w);
