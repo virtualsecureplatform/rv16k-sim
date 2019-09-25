@@ -32,17 +32,15 @@ uint16_t reg_read(struct cpu *c, uint8_t reg_idx){
 }
 
 void mem_write_b(struct cpu *c, uint16_t addr, uint8_t data){
+    assert(addr < DATA_RAM_SIZE && "RAM write to invalid address!");
+
     c->data_ram[addr] = data;
     printf("DataRam[0x%04X] <= 0x%04X ", addr, data);
 }
 
 void mem_write_w(struct cpu *c, uint16_t addr, uint16_t data){
-    if(addr == 0){
-        printf("EXIT\n");
-        exit(data);
-    }else if(addr == 2){
-        printf(" OUT %d ", data);
-    }
+
+    assert(addr < DATA_RAM_SIZE - 1 && "RAM write to invalid address!");
     c->data_ram[addr] = data&0xFF;
     c->data_ram[addr+1] = data>>8;
     printf("DataRam[0x%04X] <= 0x%04X ", addr, data&0xFF);
@@ -50,14 +48,17 @@ void mem_write_w(struct cpu *c, uint16_t addr, uint16_t data){
 }
 
 uint8_t mem_read_b(struct cpu *c, uint16_t addr){
+    assert(addr < DATA_RAM_SIZE && "RAM read from invalid address!");
     return c->data_ram[addr];
 }
 
 uint16_t mem_read_w(struct cpu *c, uint16_t addr){
+    assert(addr < DATA_RAM_SIZE - 1 && "RAM read from invalid address!");
     return c->data_ram[addr] + (c->data_ram[addr+1]<<8);
 }
 
 uint16_t rom_read_w(struct cpu *c){
+    assert(c->pc < INST_ROM_SIZE - 1 && "ROM read from invalid address!");
     return c->inst_rom[c->pc] + (c->inst_rom[c->pc+1]<<8);
 }
 
