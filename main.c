@@ -1,25 +1,34 @@
 #include <assert.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "log.h"
 #include "cpu.h"
 #include "elf_parser.h"
 #include "bitpat.h"
 #include "inst.h"
 
-void log_printf(char *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    vfprintf(stderr, fmt, args);
-    va_end(args);
-}
+#include <getopt.h>
+#include <unistd.h>
+
+extern int flag_quiet;
 
 void print_usage(FILE *fh)
 {
-    fprintf(fh, "Usage: rv16k-sim FILENAME NCYCLES [memdump]\n");
-    fprintf(fh, "       rv16k-sim test ROM RAM NCYCLES\n");
+    fprintf(fh, "Usage: rv16k-sim [-q] [-m] [-t ROM] [-d RAM] [FILENAME] NCYCLES\n");
+    fprintf(fh, "Options:\n");
+    fprintf(fh, "  -q     : No log print\n");
+    fprintf(fh, "  -m     : Dump memory\n");
+    fprintf(fh, "  -t ROM : Initial ROM data\n");
+    fprintf(fh, "  -d RAM : Initial RAM data\n");
+}
+
+_Noreturn void print_usage_to_exit(void)
+{
+    print_usage(stderr);
+    exit(1);
 }
 
 void pc_update(struct cpu *c, uint16_t offset){
@@ -162,28 +171,41 @@ int main(int argc, char *argv[]){
     struct cpu cpu;
     init_cpu(&cpu);
 
-    if (argc < 3) {
-        print_usage(stderr);
-        return 1;
+    int flag_load_elf = 1, flag_memory_dump = 0, opt;
+    while((opt = getopt(argc, argv, "qmt:d:")) != -1) {
+        switch(opt) {
+            case 'q':
+                flag_quiet = 1;
+                break;
+
+            case 'm':
+                flag_memory_dump = 1;
+                break;
+
+            case 't':
+                flag_load_elf = 0;
+                set_bytes_from_str(cpu.inst_rom, optarg, INST_ROM_SIZE);
+                break;
+
+            case 'd':
+                flag_load_elf = 0;
+                set_bytes_from_str(cpu.data_ram, optarg, DATA_RAM_SIZE);
+                break;
+
+            default:
+                print_usage_to_exit();
+        }
     }
 
-    int ncycles = 0, flag_memory_dump = 0;
-    if (argc == 3 || argc == 4) {
-        elf_parse(&cpu, argv[1]);
-        ncycles = atoi(argv[2]);
+    if (optind >= argc) print_usage_to_exit();
 
-        if (argc == 4)  // memory-dump mode
-            flag_memory_dump = 1;
-    } else { // Byte sequence has come via argv.
-        assert(argc == 5);
+    int iarg = optind;
+    if (flag_load_elf)
+        elf_parse(&cpu, argv[iarg++]);
 
-        // For ROM
-        set_bytes_from_str(cpu.inst_rom, argv[2], INST_ROM_SIZE);
-        // For RAM
-        set_bytes_from_str(cpu.data_ram, argv[3], DATA_RAM_SIZE);
-
-        ncycles = atoi(argv[4]);
-    }
+    int ncycles = 0;
+    if (iarg >= argc) print_usage_to_exit();
+    ncycles = atoi(argv[iarg]);
 
     for(int i=0;i<ncycles;i++){
         uint16_t inst = rom_read_w(&cpu);
