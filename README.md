@@ -8,15 +8,13 @@ make
 ```
 
 ## Use
-This simulator has 2 arguments.
-
-First argument is file name of binary to run on this simulator.
-
-Second argument is clock number how many times to execute.
-This simulator executes all instruction at one clock.
-
-Bellow is the example of execution.
 ```
-./main hoge.o 100
+Usage: ./main [-q] [-m] [-t ROM] [-d RAM] [FILENAME] NCYCLES
+Options:
+  -q       : No log print
+  -m       : Dump memory
+  -t ROM   : Initial ROM data
+  -d RAM   : Initial RAM data
+  FILENAME : ELF Binary
 ```
 
