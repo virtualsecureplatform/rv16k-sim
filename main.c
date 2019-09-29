@@ -83,7 +83,7 @@ int main(int argc, char *argv[]){
     struct cpu cpu;
     init_cpu(&cpu);
 
-    int flag_load_elf = 1, flag_memory_dump = 0, opt;
+    int flag_load_elf = 1, flag_memory_dump = 0, flag_delayed_clock = 0, opt;
     while((opt = getopt(argc, argv, "qmt:d:")) != -1) {
         switch(opt) {
             case 'q':
@@ -103,6 +103,9 @@ int main(int argc, char *argv[]){
                 flag_load_elf = 0;
                 set_bytes_from_str(cpu.data_ram, optarg, DATA_RAM_SIZE);
                 break;
+
+            case 'c':
+                flag_delayed_clock = 1;
 
             default:
                 print_usage_to_exit();
@@ -134,6 +137,7 @@ int main(int argc, char *argv[]){
             dump_memory(stdout, cpu.data_ram, DATA_RAM_SIZE);
             printf("\n");
         }
+        if(flag_delayed_clock) usleep(10000); //100Hz
     }
 
     for (int i = 0; i < 16; i++){
